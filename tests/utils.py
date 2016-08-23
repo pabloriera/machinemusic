@@ -49,7 +49,7 @@ def wav2audio_segment(filename,t1=0,t2=None):
     x = x[t1:t2]
     return fs,np.float64(x)/2**15
     
-def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',units='lineal',nfft_size= 2**10,nfft_hop=None,
+def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',magnitude=True,units='lineal',nfft_size= 2**10,nfft_hop=None,
              frame_size=64, step_size=None, n_bins = 84,normalization_axis=None):
     
     from scipy.signal import resample
@@ -75,14 +75,19 @@ def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',units
     
     if representation=='STFT':
         # STFT
-        S = abs(librosa.stft(x,n_fft=nfft_size,hop_length=nfft_hop,win_length=nfft_size )/2/nfft_size)
+        S = librosa.stft(x,n_fft=nfft_size,hop_length=nfft_hop,win_length=nfft_size )/2/nfft_size
 
     elif representation=='CQT':
         # CQT
-        S = abs(librosa.cqt(x,sr=fs,hop_length=nfft_hop,fmin=40.0,n_bins=n_bins,real=False))
+        S = librosa.cqt(x,sr=fs,hop_length=nfft_hop,fmin=40.0,n_bins=n_bins,real=False)
 
     S = S[::-1,:]
+    
+    if magnitude:
+        S = abs(S)
+        
     if units=='db':
+        S = abs(S)        
         S = 20*np.log10(S/S.max()).clip(-60,0)
 
     S = (S - S.min(normalization_axis)) /(S.max(normalization_axis) - S.min(normalization_axis))
