@@ -81,6 +81,7 @@ def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',units
         # CQT
         S = abs(librosa.cqt(x,sr=fs,hop_length=nfft_hop,fmin=40.0,n_bins=n_bins,real=False))
 
+    S = S[::-1,:]
     if units=='db':
         S = 20*np.log10(S/S.max()).clip(-60,0)
 
@@ -90,19 +91,15 @@ def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',units
        
     return np.array( [S[:,i*step_size:i*step_size+frame_size] for i in range(n_frames)] )
 
-def montage(images, saveto='montage.png'):
+def montage(images):
     """Draw all images as a montage separated by 1 pixel borders.
-
-    Also saves the file to the destination specified by `saveto`.
 
     Parameters
     ----------
     images : numpy.ndarray
         Input array to create montage of.  Array should be:
         batch x height x width x channels.
-    saveto : str
-        Location to save the resulting montage image.
-
+    
     Returns
     -------
     m : numpy.ndarray
@@ -128,5 +125,4 @@ def montage(images, saveto='montage.png'):
                 this_img = images[this_filter]
                 m[1 + i + i * img_h:1 + i + (i + 1) * img_h,
                   1 + j + j * img_w:1 + j + (j + 1) * img_w] = this_img
-    plt.imsave(arr=m, fname=saveto)
     return m
