@@ -49,7 +49,7 @@ def wav2audio_segment(filename,t1=0,t2=None):
     x = x[t1:t2]
     return fs,np.float64(x)/2**15
     
-def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',normalize=True,magnitude=True,units='lineal',nfft_size= 2**10,nfft_hop=None,
+def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',magnitude=True,units='lineal',nfft_size= 2**10,nfft_hop=None,
              frame_size=64, step_size=None, n_bins = 84,normalization_axis=None):
     
     from scipy.signal import resample
@@ -90,8 +90,7 @@ def audio2spectral(x,orig_fs=44100,resample_fs=22050,representation='STFT',norma
         S = abs(S)        
         S = 20*np.log10(S/S.max()).clip(-60,0)
 
-    if normalize:
-        S = (S - S.min(normalization_axis)) /(S.max(normalization_axis) - S.min(normalization_axis))
+    S = (S - S.min(normalization_axis)) /(S.max(normalization_axis) - S.min(normalization_axis))
     
     n_frames = int( (S.shape[1]-frame_size)/step_size+1 )
        
